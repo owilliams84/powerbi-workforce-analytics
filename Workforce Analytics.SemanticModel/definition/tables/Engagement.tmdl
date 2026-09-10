@@ -1,0 +1,65 @@
+/// One engagement survey response per employee, August 2022 to August 2023.
+///
+/// 1,338 of the 3,000 responses are dated when the person did not work here - 287
+/// before they started and 1,051 after they left. 'In Employment' flags them, and the
+/// headline scores count in-employment responses only.
+table Engagement
+	lineageTag: 5d9d77a0-5457-5d30-99cc-193cc189c130
+
+	column Date
+		dataType: dateTime
+		isHidden
+		formatString: yyyy-mm-dd
+		lineageTag: 533780cf-cf3f-5bc2-a3f2-e9e8938740cc
+		summarizeBy: none
+		sourceColumn: Date
+
+	column 'Employee Key'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 0201b36a-97aa-55e2-b873-9222a300909f
+		summarizeBy: none
+		sourceColumn: EmpID
+
+	column Engagement
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: ac9ae4a6-79a6-50be-bfc4-82bb11e4ea4a
+		summarizeBy: none
+		sourceColumn: Engagement
+
+	column Satisfaction
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 68c21a27-9122-52f3-ac6f-1de2aa71d158
+		summarizeBy: none
+		sourceColumn: Satisfaction
+
+	column 'Work-Life Balance'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: ee6071bb-041a-54f1-a9ea-64f1f1c07f55
+		summarizeBy: none
+		sourceColumn: WorkLifeBalance
+
+	column 'In Employment'
+		dataType: string
+		lineageTag: 195e79cc-685a-55ff-bd4d-d3720074843c
+		summarizeBy: none
+		sourceColumn: InEmployment
+
+	partition Engagement = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(Web.Contents("https://raw.githubusercontent.com/owilliams84/powerbi-workforce-analytics/main/data/fact_engagement.csv"), [Delimiter=",", Columns=6, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Applied Types" = Table.TransformColumnTypes(#"Promoted Headers", {{"Date", type date}, {"EmpID", Int64.Type}, {"Engagement", Int64.Type}, {"Satisfaction", Int64.Type}, {"WorkLifeBalance", Int64.Type}, {"InEmployment", type text}})
+				in
+				    #"Applied Types"
+
+	annotation PBI_ResultType = Table

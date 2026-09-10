@@ -1,0 +1,93 @@
+/// One row per day from 1 August 2018 to 31 August 2023, contiguous, and marked as the
+/// date table so DATESINPERIOD has a calendar to walk.
+///
+/// The file's last event is 6 August 2023, so 2023 holds seven complete months and
+/// 2018 holds five. The turnover measures annualise over the months actually in view
+/// rather than assuming twelve.
+table Date
+	lineageTag: 907ec41f-04fe-5240-bb4a-ca316ef72768
+	dataCategory: Time
+
+	column Date
+		dataType: dateTime
+		isKey
+		formatString: d mmm yyyy
+		lineageTag: 19d16ca7-5fa9-5758-b677-532158025de1
+		summarizeBy: none
+		sourceColumn: Date
+
+	column Year
+		dataType: int64
+		formatString: 0
+		lineageTag: 14954725-3705-5e67-a078-03143f883112
+		summarizeBy: none
+		sourceColumn: Year
+
+	column Quarter
+		dataType: string
+		lineageTag: 4c6d89ea-c220-53ff-bc4e-2a51c80502b9
+		summarizeBy: none
+		sourceColumn: Quarter
+
+	column 'Month No'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 2cb3038b-4719-57a9-8881-8f035b458f65
+		summarizeBy: none
+		sourceColumn: MonthNumber
+
+	column Month
+		dataType: string
+		lineageTag: a7362fd7-0c01-5273-aa87-fbd4d5f8ce78
+		summarizeBy: none
+		sourceColumn: MonthName
+		sortByColumn: 'Month No'
+
+	column 'Month Short'
+		dataType: string
+		lineageTag: 4f6a78ae-dd53-5a15-bbf2-d66484e52700
+		summarizeBy: none
+		sourceColumn: MonthShort
+		sortByColumn: 'Month No'
+
+	column 'Month Year'
+		dataType: string
+		lineageTag: 0525fc1b-a98d-5e59-bdd8-0c8ad3f7e47a
+		summarizeBy: none
+		sourceColumn: MonthYear
+		sortByColumn: 'Month Year Sort'
+
+	column 'Month Year Sort'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 16481834-3b88-516d-8b03-c1dab4ad360c
+		summarizeBy: none
+		sourceColumn: MonthYearSort
+
+	/// First day of the month, for a continuous monthly axis.
+	column 'Month Start'
+		dataType: dateTime
+		formatString: mmm yyyy
+		lineageTag: 116498aa-5ada-50dc-a94d-f0de45916c04
+		summarizeBy: none
+		sourceColumn: MonthStart
+
+	column 'Is Month End'
+		dataType: string
+		lineageTag: 013dd56f-31c0-529f-8ee5-1bdc631cd179
+		summarizeBy: none
+		sourceColumn: IsMonthEnd
+
+	partition Date = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(Web.Contents("https://raw.githubusercontent.com/owilliams84/powerbi-workforce-analytics/main/data/dim_date.csv"), [Delimiter=",", Columns=10, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Applied Types" = Table.TransformColumnTypes(#"Promoted Headers", {{"Date", type date}, {"Year", Int64.Type}, {"Quarter", type text}, {"MonthNumber", Int64.Type}, {"MonthName", type text}, {"MonthShort", type text}, {"MonthYear", type text}, {"MonthYearSort", Int64.Type}, {"MonthStart", type date}, {"IsMonthEnd", type text}})
+				in
+				    #"Applied Types"
+
+	annotation PBI_ResultType = Table

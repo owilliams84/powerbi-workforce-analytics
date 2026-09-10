@@ -1,0 +1,101 @@
+{
+  "source_rows": {
+    "employees": 3000,
+    "surveys": 3000,
+    "applicants": 3000,
+    "training": 3000
+  },
+  "untrimmed_values": {
+    "Title": 8,
+    "DepartmentType": 2020
+  },
+  "date_format": {
+    "DOB": {
+      "first_over_12": 1823,
+      "second_over_12": 0,
+      "day_first": true
+    },
+    "Survey Date": {
+      "first_over_12": 1814,
+      "second_over_12": 0,
+      "day_first": true
+    }
+  },
+  "as_at": "2023-08-06",
+  "exit_before_start": 0,
+  "status_conflicts": 1146,
+  "status_conflicts_by_label": {
+    "Active": 991,
+    "Leave of Absence": 86,
+    "Future Start": 69
+  },
+  "termination_types": {
+    "Involuntary": 388,
+    "Voluntary": 388,
+    "Resignation": 380,
+    "Retirement": 377
+  },
+  "leavers_within_first_year": 725,
+  "leavers": 1533,
+  "recruitment_id_collision": {
+    "ids_matching_employees": 3000,
+    "same_person_by_name": 0
+  },
+  "recruitment_state_country_conflict": 3000,
+  "recruitment_countries": 243,
+  "applicant_titles_not_in_company": 3000,
+  "managers": 2952,
+  "dropped_columns_employee": [
+    "FirstName",
+    "LastName",
+    "ADEmail",
+    "Supervisor",
+    "DOB",
+    "MaritalDesc",
+    "LocationCode"
+  ],
+  "calendar": {
+    "from": "2018-08-01",
+    "to": "2023-08-31"
+  },
+  "surveys_outside_employment": {
+    "before_start": 287,
+    "after_exit": 1051,
+    "in_employment": 1662
+  },
+  "training_outside_employment": {
+    "before_start": 288,
+    "after_exit": 1029,
+    "in_employment": 1683
+  },
+  "dropped_columns_training": [
+    "Location",
+    "Trainer"
+  ],
+  "recruitment_excluded": true,
+  "training_cost": {
+    "all_records": 1675886.09,
+    "outside_employment": 735144.77
+  },
+  "headcount_at_as_at_month_end": 1480,
+  "joiners_by_year": {
+    "2018": 255,
+    "2019": 598,
+    "2020": 592,
+    "2021": 600,
+    "2022": 620,
+    "2023": 335
+  },
+  "leavers_by_year": {
+    "2018": 4,
+    "2019": 62,
+    "2020": 133,
+    "2021": 278,
+    "2022": 460,
+    "2023": 596
+  },
+  "engagement_mean": {
+    "all_surveys": 2.9397,
+    "in_employment": 2.9483
+  }
+}

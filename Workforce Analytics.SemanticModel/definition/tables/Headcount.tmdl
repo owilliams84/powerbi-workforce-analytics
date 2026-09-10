@@ -1,0 +1,35 @@
+/// One row per employee per month-end they were employed at - a snapshot, not a flow.
+///
+/// Headcount is a stock. Summing it across months counts the same person twelve times a
+/// year, so no measure here ever does: [Headcount] reads the last month-end in view and
+/// [Average Headcount] averages the month-ends.
+table Headcount
+	lineageTag: c4531279-29ab-5f1b-8bcf-8b1c7765d621
+
+	column Date
+		dataType: dateTime
+		isHidden
+		formatString: yyyy-mm-dd
+		lineageTag: 4fba9aaf-fa2e-533c-b9f7-6eeecaf8224f
+		summarizeBy: none
+		sourceColumn: Date
+
+	column 'Employee Key'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: f0911f41-5158-5ed3-9dd9-5efb786929ce
+		summarizeBy: none
+		sourceColumn: EmpID
+
+	partition Headcount = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(Web.Contents("https://raw.githubusercontent.com/owilliams84/powerbi-workforce-analytics/main/data/fact_headcount.csv"), [Delimiter=",", Columns=2, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Applied Types" = Table.TransformColumnTypes(#"Promoted Headers", {{"Date", type date}, {"EmpID", Int64.Type}})
+				in
+				    #"Applied Types"
+
+	annotation PBI_ResultType = Table

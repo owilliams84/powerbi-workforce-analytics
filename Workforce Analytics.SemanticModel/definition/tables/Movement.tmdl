@@ -1,0 +1,37 @@
+/// Joiners and leavers, one row per event, dated on the start or exit date.
+table Movement
+	lineageTag: e29732f6-bfbc-5150-8d9e-f0be6219e616
+
+	column Date
+		dataType: dateTime
+		isHidden
+		formatString: yyyy-mm-dd
+		lineageTag: 17014079-6fae-5ccc-b697-72b596524472
+		summarizeBy: none
+		sourceColumn: Date
+
+	column 'Employee Key'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: a95fc0de-6dfd-5f3c-b62f-9ae6494a7e53
+		summarizeBy: none
+		sourceColumn: EmpID
+
+	column Movement
+		dataType: string
+		lineageTag: d1b6ec31-dab1-5aed-8cb1-5e21f05afb2e
+		summarizeBy: none
+		sourceColumn: Movement
+
+	partition Movement = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(Web.Contents("https://raw.githubusercontent.com/owilliams84/powerbi-workforce-analytics/main/data/fact_movement.csv"), [Delimiter=",", Columns=3, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Applied Types" = Table.TransformColumnTypes(#"Promoted Headers", {{"Date", type date}, {"EmpID", Int64.Type}, {"Movement", type text}})
+				in
+				    #"Applied Types"
+
+	annotation PBI_ResultType = Table

@@ -1,0 +1,78 @@
+/// One training record per employee, August 2022 to August 2023. Trainer and location
+/// are dropped: a trainer is a named person.
+///
+/// 1,317 records are dated outside the person's employment, and they carry $735,145 of
+/// the $1,675,886 training cost - 44%. Spend the organisation cannot attach to anyone
+/// who worked here at the time is a finding, not a rounding error.
+table Training
+	lineageTag: 8f649b01-e2fb-5e72-a8aa-7d12f6e4cb05
+
+	column Date
+		dataType: dateTime
+		isHidden
+		formatString: yyyy-mm-dd
+		lineageTag: f37b19f0-cd65-5dda-b276-788dd4559432
+		summarizeBy: none
+		sourceColumn: Date
+
+	column 'Employee Key'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 83a181d2-88a4-51b3-a58f-92f428ad0553
+		summarizeBy: none
+		sourceColumn: EmpID
+
+	column 'Program Key'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: e4bc79b0-5034-5fe2-88ad-df6c45bc1255
+		summarizeBy: none
+		sourceColumn: ProgramKey
+
+	column 'Training Type'
+		dataType: string
+		lineageTag: bf1b83ca-2da0-5be9-b122-03006d46328f
+		summarizeBy: none
+		sourceColumn: TrainingType
+
+	column Outcome
+		dataType: string
+		lineageTag: 0b928074-3688-50e2-9df6-705373f253a1
+		summarizeBy: none
+		sourceColumn: Outcome
+
+	column Days
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 055fb602-479e-5861-a4ea-982a5257b1f6
+		summarizeBy: none
+		sourceColumn: Days
+
+	column Cost
+		dataType: double
+		isHidden
+		formatString: \$#,0.00
+		lineageTag: 4919a5c8-50e3-599b-acb2-bce4b42b2a49
+		summarizeBy: none
+		sourceColumn: Cost
+
+	column 'In Employment'
+		dataType: string
+		lineageTag: 32275b82-5d6e-550d-872b-c6f6c9c35e1d
+		summarizeBy: none
+		sourceColumn: InEmployment
+
+	partition Training = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(Web.Contents("https://raw.githubusercontent.com/owilliams84/powerbi-workforce-analytics/main/data/fact_training.csv"), [Delimiter=",", Columns=8, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Applied Types" = Table.TransformColumnTypes(#"Promoted Headers", {{"Date", type date}, {"EmpID", Int64.Type}, {"ProgramKey", Int64.Type}, {"TrainingType", type text}, {"Outcome", type text}, {"Days", Int64.Type}, {"Cost", type number}, {"InEmployment", type text}})
+				in
+				    #"Applied Types"
+
+	annotation PBI_ResultType = Table

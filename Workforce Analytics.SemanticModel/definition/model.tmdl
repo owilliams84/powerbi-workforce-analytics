@@ -1,0 +1,20 @@
+model Model
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	discourageImplicitMeasures
+	sourceQueryCulture: en-US
+
+annotation PBI_QueryOrder = ["Date", "Employee", "Program", "Headcount", "Movement", "Engagement", "Training"]
+
+annotation __PBI_TimeIntelligenceEnabled = 0
+
+annotation PBI_ProTooling = ["DevMode"]
+
+ref table Date
+ref table Employee
+ref table Program
+ref table Headcount
+ref table Movement
+ref table Engagement
+ref table Training
+ref table Metrics

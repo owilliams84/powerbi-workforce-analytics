@@ -1,0 +1,71 @@
+EVALUATE
+UNION(
+    SELECTCOLUMNS(
+        SUMMARIZECOLUMNS(
+            'Date'[Year],
+            "v_joiners", [Joiners],
+            "v_leavers", [Leavers],
+            "v_early", [Early Leavers],
+            "v_headcount", [Headcount],
+            "v_avg_headcount", [Average Headcount],
+            "v_engagement", [Engagement Score],
+            "v_surveys", [Surveys],
+            "v_training_cost", [Training Cost],
+            "v_completion", [Completion Rate %],
+            "v_cost_outside", [Training Cost Outside Employment]
+        ),
+        "grain", "year",
+        "key", FORMAT('Date'[Year], "0"),
+        "joiners", [v_joiners],
+        "leavers", [v_leavers],
+        "early", [v_early],
+        "headcount", [v_headcount],
+        "avg_headcount", ROUND([v_avg_headcount], 4),
+        "engagement", ROUND([v_engagement], 6),
+        "surveys", [v_surveys],
+        "training_cost", ROUND([v_training_cost], 2),
+        "completion", ROUND([v_completion], 6),
+        "cost_outside", ROUND([v_cost_outside], 2)
+    ),
+    SELECTCOLUMNS(
+        SUMMARIZECOLUMNS(
+            'Employee'[Department],
+            "v_joiners", [Joiners],
+            "v_leavers", [Leavers],
+            "v_early", [Early Leavers],
+            "v_headcount", [Headcount],
+            "v_avg_headcount", [Average Headcount],
+            "v_engagement", [Engagement Score],
+            "v_surveys", [Surveys],
+            "v_training_cost", [Training Cost],
+            "v_completion", [Completion Rate %],
+            "v_cost_outside", [Training Cost Outside Employment]
+        ),
+        "grain", "department",
+        "key", 'Employee'[Department],
+        "joiners", [v_joiners],
+        "leavers", [v_leavers],
+        "early", [v_early],
+        "headcount", [v_headcount],
+        "avg_headcount", ROUND([v_avg_headcount], 4),
+        "engagement", ROUND([v_engagement], 6),
+        "surveys", [v_surveys],
+        "training_cost", ROUND([v_training_cost], 2),
+        "completion", ROUND([v_completion], 6),
+        "cost_outside", ROUND([v_cost_outside], 2)
+    ),
+    ROW(
+        "grain", "all",
+        "key", "all",
+        "joiners", [Joiners],
+        "leavers", [Leavers],
+        "early", [Early Leavers],
+        "headcount", [Headcount],
+        "avg_headcount", ROUND([Average Headcount], 4),
+        "engagement", ROUND([Engagement Score], 6),
+        "surveys", [Surveys],
+        "training_cost", ROUND([Training Cost], 2),
+        "completion", ROUND([Completion Rate %], 6),
+        "cost_outside", ROUND([Training Cost Outside Employment], 2)
+    )
+)

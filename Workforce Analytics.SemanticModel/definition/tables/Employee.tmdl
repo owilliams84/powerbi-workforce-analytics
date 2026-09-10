@@ -1,0 +1,216 @@
+/// One row per person who has ever worked here - 3,000 of them, 1,533 since gone.
+///
+/// Names, email, supervisor name, date of birth, marital status and location code are
+/// dropped in the ETL. Age survives only as a band, and the supervisor as an opaque
+/// manager key, which is enough for span of control and nothing more.
+///
+/// 'Status' is derived from the start and exit dates. 'Source Status' is what the HR
+/// system said, and 'Status Check' records where the two disagree - 1,146 people, 991
+/// of them marked Active with an exit date already passed.
+table Employee
+	lineageTag: 7a556bb1-087e-5f27-80f8-a3037793b71a
+
+	/// The employee id. No names travel with it.
+	column Employee
+		dataType: int64
+		isKey
+		formatString: 0
+		lineageTag: 9c5c5f46-a6f6-5e29-8ff2-fe9404cd23e0
+		summarizeBy: none
+		sourceColumn: EmpID
+
+	column Title
+		dataType: string
+		lineageTag: 092ed9ad-8b30-548a-9794-bb3ef3d54fde
+		summarizeBy: none
+		sourceColumn: Title
+
+	column 'Manager Key'
+		dataType: string
+		isHidden
+		lineageTag: 0364e490-eab4-5e81-805b-70b33ec4f8c3
+		summarizeBy: none
+		sourceColumn: ManagerKey
+
+	column 'Business Unit'
+		dataType: string
+		lineageTag: 32a2eab9-ecc0-530b-9448-a892f8d4d369
+		summarizeBy: none
+		sourceColumn: BusinessUnit
+
+	/// Trimmed in the ETL: every Production row in the source carries a trailing
+	/// space, which would make 'Production' two departments.
+	column Department
+		dataType: string
+		lineageTag: 7c7e4012-c1d3-5dac-a8c8-e0627d55591e
+		summarizeBy: none
+		sourceColumn: Department
+
+	column Division
+		dataType: string
+		lineageTag: 810ca5cd-1123-567b-a267-a7fe3a94154b
+		summarizeBy: none
+		sourceColumn: Division
+
+	column 'Job Function'
+		dataType: string
+		lineageTag: 13bed62b-0fbf-5693-af10-210d8f3ad622
+		summarizeBy: none
+		sourceColumn: JobFunction
+
+	column 'Employee Type'
+		dataType: string
+		lineageTag: 657ee49c-d18a-5cd9-a9cb-7649d44bfcfc
+		summarizeBy: none
+		sourceColumn: EmployeeType
+
+	column Classification
+		dataType: string
+		lineageTag: c874cb4e-2b58-563c-9727-4e68e330c9ca
+		summarizeBy: none
+		sourceColumn: Classification
+
+	column 'Pay Zone'
+		dataType: string
+		lineageTag: f19c3e35-8157-597e-8263-909cb9502545
+		summarizeBy: none
+		sourceColumn: PayZone
+
+	column State
+		dataType: string
+		lineageTag: a2b150a2-1220-5868-9186-07b63f99187b
+		summarizeBy: none
+		sourceColumn: State
+
+	column Gender
+		dataType: string
+		lineageTag: 9eb71f9c-6860-50fa-87e2-f30a39268254
+		summarizeBy: none
+		sourceColumn: Gender
+
+	column Ethnicity
+		dataType: string
+		lineageTag: 5a456745-4eab-5b3d-b2e3-c775cbb5c928
+		summarizeBy: none
+		sourceColumn: Ethnicity
+
+	/// Age at 6 August 2023, the file's as-at date.
+	column 'Age Band'
+		dataType: string
+		lineageTag: 16243877-1611-560f-a83a-352b74238ce9
+		summarizeBy: none
+		sourceColumn: AgeBand
+		sortByColumn: 'Age Band Sort'
+
+	column 'Age Band Sort'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 8fa2b362-3154-5160-86c2-634e24de48b0
+		summarizeBy: none
+		sourceColumn: AgeBandSort
+
+	/// Service to the exit date for a leaver, to the as-at date for everyone else.
+	column 'Tenure Band'
+		dataType: string
+		lineageTag: b0975211-3de6-5364-bcf7-30e53dd244cf
+		summarizeBy: none
+		sourceColumn: TenureBand
+		sortByColumn: 'Tenure Band Sort'
+
+	column 'Tenure Band Sort'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 952ad70b-a0b2-571a-a02a-6f20461c1471
+		summarizeBy: none
+		sourceColumn: TenureBandSort
+
+	column 'Tenure Years'
+		dataType: double
+		formatString: 0.00
+		lineageTag: 5be97769-f332-5f3c-b895-c70b776cef41
+		summarizeBy: none
+		sourceColumn: TenureYears
+
+	column Performance
+		dataType: string
+		lineageTag: bda9888f-83d8-5859-8585-5914efa751f8
+		summarizeBy: none
+		sourceColumn: Performance
+
+	column Rating
+		dataType: int64
+		formatString: 0
+		lineageTag: 8b3c9b2c-510c-59f7-95c9-ed01e3b96ff4
+		summarizeBy: none
+		sourceColumn: Rating
+
+	column 'Start Date'
+		dataType: dateTime
+		formatString: d mmm yyyy
+		lineageTag: b00a0dd4-0c0f-57ff-9343-9c1d799eb3ff
+		summarizeBy: none
+		sourceColumn: StartDate
+
+	column 'Exit Date'
+		dataType: dateTime
+		formatString: d mmm yyyy
+		lineageTag: 2ba71557-d1bd-5df5-a6fa-26ab69e98d7b
+		summarizeBy: none
+		sourceColumn: ExitDate
+
+	/// Employed or Left, from the dates - the model's version of the truth.
+	column Status
+		dataType: string
+		lineageTag: 1ed4838c-8009-5760-a65c-cc0d164dc799
+		summarizeBy: none
+		sourceColumn: Status
+
+	/// The HR system's employment status, kept so the conflict stays visible.
+	column 'Source Status'
+		dataType: string
+		lineageTag: 1ce0f029-75c1-506d-a585-15911c53f4fe
+		summarizeBy: none
+		sourceColumn: SourceStatus
+
+	column 'Status Check'
+		dataType: string
+		lineageTag: c9f2f60a-5167-5195-8396-c57fe70c7763
+		summarizeBy: none
+		sourceColumn: StatusCheck
+
+	/// The source's termination type, blank for anyone still employed (the source
+	/// says 'Unk'). Voluntary and Resignation are separate values in the source
+	/// and mean the same thing; 'Leaver Group' merges them.
+	column 'Leaver Reason'
+		dataType: string
+		lineageTag: 46cb5103-98eb-5e6e-b907-07588ca2c040
+		summarizeBy: none
+		sourceColumn: LeaverReason
+
+	column 'Leaver Group'
+		dataType: string
+		lineageTag: 697098c9-bf5c-56b3-9d27-496c4c7cdbac
+		summarizeBy: none
+		sourceColumn: LeaverGroup
+
+	/// Yes for anyone who left inside their first year.
+	column 'Early Leaver'
+		dataType: string
+		lineageTag: 013c7b16-e852-599c-9f5f-adb1ed3f1cf7
+		summarizeBy: none
+		sourceColumn: EarlyLeaver
+
+	partition Employee = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(Web.Contents("https://raw.githubusercontent.com/owilliams84/powerbi-workforce-analytics/main/data/dim_employee.csv"), [Delimiter=",", Columns=28, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Blanks to Null" = Table.ReplaceValue(#"Promoted Headers", "", null, Replacer.ReplaceValue, {"ExitDate"}),
+				    #"Applied Types" = Table.TransformColumnTypes(#"Blanks to Null", {{"EmpID", Int64.Type}, {"Title", type text}, {"ManagerKey", type text}, {"BusinessUnit", type text}, {"Department", type text}, {"Division", type text}, {"JobFunction", type text}, {"EmployeeType", type text}, {"Classification", type text}, {"PayZone", type text}, {"State", type text}, {"Gender", type text}, {"Ethnicity", type text}, {"AgeBand", type text}, {"AgeBandSort", Int64.Type}, {"TenureBand", type text}, {"TenureBandSort", Int64.Type}, {"TenureYears", type number}, {"Performance", type text}, {"Rating", Int64.Type}, {"StartDate", type date}, {"ExitDate", type date}, {"Status", type text}, {"SourceStatus", type text}, {"StatusCheck", type text}, {"LeaverReason", type text}, {"LeaverGroup", type text}, {"EarlyLeaver", type text}})
+				in
+				    #"Applied Types"
+
+	annotation PBI_ResultType = Table

@@ -1,0 +1,220 @@
+/// Measure-only table. Nothing here stores data; the hidden column exists because
+/// a table needs one. Every number on the report comes from here.
+table Metrics
+	lineageTag: fdd8cddf-5990-5a7e-b794-751bd2244e5a
+
+	/// Every employee record, whatever their dates. Not a headcount - see [Headcount].
+	measure Employees = COUNTROWS('Employee')
+		formatString: #,0
+		lineageTag: cf92ba4b-fc65-5608-9508-1d1d71193929
+
+	/// The month-end [Headcount] is read at: the last one in view.
+	measure 'Snapshot Date' = CALCULATE(MAX('Headcount'[Date]), REMOVEFILTERS('Employee'))
+		formatString: d mmm yyyy
+		lineageTag: 064c0e43-3dc1-501d-a05a-1d992f039d8f
+
+	/// People employed at the last month-end in view. A stock, so it is read at a point in time
+	/// and never summed across months.
+	measure Headcount =
+			VAR LastSnapshot = [Snapshot Date]
+			RETURN
+			    CALCULATE(COUNTROWS('Headcount'), 'Date'[Date] = LastSnapshot)
+		formatString: #,0
+		lineageTag: be114e6e-d9b5-512f-975d-160d2976de8e
+
+	/// Month-end snapshots in the current filter - the denominator for annualising.
+	measure 'Months in View' = COUNTROWS(CALCULATETABLE(VALUES('Headcount'[Date]), REMOVEFILTERS('Employee')))
+		formatString: 0
+		lineageTag: 58ab957a-7d51-51ac-94e7-450559773d82
+
+	/// Mean of the month-end headcounts in view. The +0 counts a month where a department had
+	/// nobody as zero rather than skipping it, which would flatter the average.
+	measure 'Average Headcount' =
+			AVERAGEX(
+			    CALCULATETABLE(VALUES('Headcount'[Date]), REMOVEFILTERS('Employee')),
+			    CALCULATE(COUNTROWS('Headcount')) + 0
+			)
+		formatString: #,0.0
+		lineageTag: 6738e2b3-5b0a-591a-aa2f-539f5a29268f
+
+	measure Joiners = CALCULATE(COUNTROWS('Movement'), KEEPFILTERS('Movement'[Movement] = "Joiner"))
+		formatString: #,0
+		lineageTag: 4575495a-6c57-57dc-b550-92c53aaa59f6
+
+	/// People whose exit date falls in the period - including the 991 the HR system still
+	/// calls Active.
+	measure Leavers = CALCULATE(COUNTROWS('Movement'), KEEPFILTERS('Movement'[Movement] = "Leaver"))
+		formatString: #,0
+		lineageTag: a42ffc4c-8839-5e95-a12f-7afc960c7d1f
+
+	measure 'Net Change' = [Joiners] - [Leavers]
+		formatString: #,0;-#,0;0
+		lineageTag: 8604c742-0f02-58c0-b9c9-8b632f442116
+
+	/// Voluntary and Resignation together - two source labels for one thing.
+	measure 'Voluntary Leavers' = CALCULATE([Leavers], KEEPFILTERS('Employee'[Leaver Group] = "Voluntary"))
+		formatString: #,0
+		lineageTag: c511c438-317c-5dde-a412-bbeba61aea66
+
+	measure 'Voluntary Share %' = DIVIDE([Voluntary Leavers], [Leavers])
+		formatString: 0.0%
+		lineageTag: 711b9081-b77a-5b73-9976-82ed3198973c
+
+	/// Leavers who went inside their first year.
+	measure 'Early Leavers' = CALCULATE([Leavers], KEEPFILTERS('Employee'[Early Leaver] = "Yes"))
+		formatString: #,0
+		lineageTag: fa08a818-a8e3-567a-80f8-6a06e398bf0f
+
+	/// 47% over the file: nearly half of everyone who leaves, leaves in year one. That is an
+	/// onboarding and hiring question before it is a retention one.
+	measure 'Early Leaver Share %' = DIVIDE([Early Leavers], [Leavers])
+		formatString: 0.0%
+		lineageTag: 870f6847-31f8-5d3a-8d28-7a87e6a277a0
+
+	/// Leavers over average headcount for the period in view, not annualised.
+	measure 'Turnover Rate %' = DIVIDE([Leavers], [Average Headcount])
+		formatString: 0.0%
+		lineageTag: 2f84a0ec-87b6-5298-9384-774a11de8af2
+
+	/// Turnover scaled to a year using the months actually in view, so 2023's seven months and
+	/// 2018's five compare with a full year.
+	measure 'Annualised Turnover %' = DIVIDE([Leavers] * 12, [Average Headcount] * [Months in View])
+		formatString: 0.0%
+		lineageTag: a83e77e9-e888-5d86-b1bc-cb7932e4a634
+
+	measure 'Leavers 12M' = CALCULATE([Leavers], DATESINPERIOD('Date'[Date], MAX('Date'[Date]), -12, MONTH))
+		formatString: #,0
+		lineageTag: 26fe2476-8b99-5e39-8a60-4a2add442337
+
+	measure 'Average Headcount 12M' = CALCULATE([Average Headcount], DATESINPERIOD('Date'[Date], MAX('Date'[Date]), -12, MONTH))
+		formatString: #,0.0
+		lineageTag: a73d310e-9a20-59c4-b5cf-c8d6ae1a9ab5
+
+	/// Rolling twelve-month turnover at each month-end - the line to watch.
+	measure 'Turnover 12M %' = DIVIDE([Leavers 12M], [Average Headcount 12M])
+		formatString: 0.0%
+		lineageTag: 552c80dc-b910-5b93-9e15-40889453c54a
+
+	/// Years of service at the exit date, for leavers in the period. A median because a handful
+	/// of long-service exits drag the mean.
+	measure 'Median Tenure at Exit' =
+			MEDIANX(
+			    CALCULATETABLE(
+			        SUMMARIZE('Movement', 'Employee'[Employee], 'Employee'[Tenure Years]),
+			        KEEPFILTERS('Movement'[Movement] = "Leaver")
+			    ),
+			    'Employee'[Tenure Years]
+			)
+		formatString: 0.00
+		lineageTag: 7826ec98-82b9-55e4-956e-79edae011922
+
+	/// Responses dated while the person was employed.
+	measure Surveys = CALCULATE(COUNTROWS('Engagement'), KEEPFILTERS('Engagement'[In Employment] = "Yes"))
+		formatString: #,0
+		lineageTag: d04135f8-207e-5646-bfd8-df3c4fc83f63
+
+	measure 'Surveys Outside Employment' = CALCULATE(COUNTROWS('Engagement'), KEEPFILTERS('Engagement'[In Employment] = "No"))
+		formatString: #,0
+		lineageTag: 50a3eebc-ac7d-50de-b06d-1a5a153f2229
+
+	/// Mean engagement, 1 to 5, from responses dated while the person was employed.
+	measure 'Engagement Score' = CALCULATE(AVERAGE('Engagement'[Engagement]), KEEPFILTERS('Engagement'[In Employment] = "Yes"))
+		formatString: 0.00
+		lineageTag: 0997d987-dd38-5ace-ad47-bc7089c25f41
+
+	/// The same mean over every response, including the 1,338 from people who were not employed
+	/// on the survey date. Kept to show the difference, which here is small - the problem is
+	/// that the rows exist, not that they move the mean.
+	measure 'Engagement Score (all responses)' = AVERAGE('Engagement'[Engagement])
+		formatString: 0.00
+		lineageTag: 958db8ac-30c2-5c0d-a800-318716c04dc9
+
+	measure 'Satisfaction Score' = CALCULATE(AVERAGE('Engagement'[Satisfaction]), KEEPFILTERS('Engagement'[In Employment] = "Yes"))
+		formatString: 0.00
+		lineageTag: 54345748-8954-557d-9cf0-cf355254e6a5
+
+	measure 'Work-Life Balance Score' = CALCULATE(AVERAGE('Engagement'[Work-Life Balance]), KEEPFILTERS('Engagement'[In Employment] = "Yes"))
+		formatString: 0.00
+		lineageTag: b40c85d4-1a4e-5814-a342-3772adc25137
+
+	/// Records dated while the person was employed.
+	measure 'Training Records' = CALCULATE(COUNTROWS('Training'), KEEPFILTERS('Training'[In Employment] = "Yes"))
+		formatString: #,0
+		lineageTag: 4e9af443-3ef4-51fb-93ed-58b7f6666a24
+
+	measure 'Training Records Outside Employment' = CALCULATE(COUNTROWS('Training'), KEEPFILTERS('Training'[In Employment] = "No"))
+		formatString: #,0
+		lineageTag: 5f411ff9-42f3-55dc-9f26-1f0784933c92
+
+	measure 'Training Cost' = CALCULATE(SUM('Training'[Cost]), KEEPFILTERS('Training'[In Employment] = "Yes"))
+		formatString: \$#,0
+		lineageTag: cc458a39-7798-5a8b-b24b-d990a790bd02
+
+	measure 'Training Cost (all records)' = SUM('Training'[Cost])
+		formatString: \$#,0
+		lineageTag: 1304473c-b8bb-573f-b4b8-04fa930457e9
+
+	/// Cost recorded against people who were not employed on the training date.
+	measure 'Training Cost Outside Employment' = CALCULATE(SUM('Training'[Cost]), KEEPFILTERS('Training'[In Employment] = "No"))
+		formatString: \$#,0
+		lineageTag: 075f0fe5-13db-51c2-b3ed-d8e30dd60136
+
+	measure 'Unattributable Cost %' = DIVIDE([Training Cost Outside Employment], [Training Cost (all records)])
+		formatString: 0.0%
+		lineageTag: 410d5279-41bd-5cb2-9299-8c88dbeb76a3
+
+	measure 'Training Days' = CALCULATE(SUM('Training'[Days]), KEEPFILTERS('Training'[In Employment] = "Yes"))
+		formatString: #,0
+		lineageTag: 4bfa9734-667f-521d-ba66-ddd204fa58ae
+
+	/// Completed or passed, as a share of in-employment records.
+	measure 'Completion Rate %' =
+			DIVIDE(
+			    CALCULATE([Training Records], KEEPFILTERS('Training'[Outcome] IN {"Completed", "Passed"})),
+			    [Training Records]
+			)
+		formatString: 0.0%
+		lineageTag: 2552d7d2-d47e-5bd0-a1fd-585d2c0cee85
+
+	measure 'Cost per Record' = DIVIDE([Training Cost], [Training Records])
+		formatString: \$#,0
+		lineageTag: d496e6a3-2e14-5399-a667-6f964f6b2a16
+
+	/// People whose HR-system status disagrees with their own start and exit dates.
+	measure 'Status Conflicts' = CALCULATE([Employees], KEEPFILTERS('Employee'[Status Check] = "Contradicts dates"))
+		formatString: #,0
+		lineageTag: 5dc8fc46-5af9-5fe3-85d3-fd82a988cf0a
+
+	measure 'Status Conflict Rate %' = DIVIDE([Status Conflicts], [Employees])
+		formatString: 0.0%
+		lineageTag: b59758e6-9ff3-53a7-ae4c-7009eae5dcf2
+
+	/// A label for the period on screen: '2021', or 'Aug 2018 to Aug 2023'.
+	measure 'Report Period' =
+			VAR First = MIN('Date'[Date])
+			VAR Last = MAX('Date'[Date])
+			VAR WholeYears = MONTH(First) = 1 && DAY(First) = 1 && MONTH(Last) = 12 && DAY(Last) = 31
+			RETURN
+			    SWITCH(
+			        TRUE(),
+			        WholeYears && YEAR(First) = YEAR(Last), FORMAT(Last, "yyyy"),
+			        FORMAT(First, "mmm yyyy") & " to " & FORMAT(Last, "mmm yyyy")
+			    )
+		lineageTag: 2b8e0805-2eb3-5c15-b55f-e3bb96dd5712
+
+	column Column
+		dataType: string
+		isHidden
+		lineageTag: cd05b732-a5e8-5e58-9598-70ba24cf2561
+		summarizeBy: none
+		sourceColumn: Column
+
+	partition Metrics = m
+		mode: import
+		source =
+				let
+				    Source = #table(type table [Column = text], {})
+				in
+				    Source
+
+	annotation PBI_ResultType = Table

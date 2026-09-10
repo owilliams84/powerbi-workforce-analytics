@@ -1,0 +1,35 @@
+relationship 'Date to Headcount'
+	fromColumn: Headcount.Date
+	toColumn: Date.Date
+
+relationship 'Employee to Headcount'
+	fromColumn: Headcount.'Employee Key'
+	toColumn: Employee.Employee
+
+relationship 'Date to Movement'
+	fromColumn: Movement.Date
+	toColumn: Date.Date
+
+relationship 'Employee to Movement'
+	fromColumn: Movement.'Employee Key'
+	toColumn: Employee.Employee
+
+relationship 'Date to Engagement'
+	fromColumn: Engagement.Date
+	toColumn: Date.Date
+
+relationship 'Employee to Engagement'
+	fromColumn: Engagement.'Employee Key'
+	toColumn: Employee.Employee
+
+relationship 'Date to Training'
+	fromColumn: Training.Date
+	toColumn: Date.Date
+
+relationship 'Employee to Training'
+	fromColumn: Training.'Employee Key'
+	toColumn: Employee.Employee
+
+relationship 'Program to Training'
+	fromColumn: Training.'Program Key'
+	toColumn: Program.'Program Key'

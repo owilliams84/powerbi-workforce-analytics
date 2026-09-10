@@ -1,0 +1,30 @@
+/// The five training programmes in the file.
+table Program
+	lineageTag: 5e6ae69d-8a80-51b8-afa9-5c9465764cf5
+
+	column 'Program Key'
+		dataType: int64
+		isHidden
+		isKey
+		formatString: 0
+		lineageTag: 036aa49f-c39d-5c25-abba-3ad1807b6a35
+		summarizeBy: none
+		sourceColumn: ProgramKey
+
+	column Program
+		dataType: string
+		lineageTag: 1a1a0179-135d-5e31-9ed3-cd22d1e8824e
+		summarizeBy: none
+		sourceColumn: Program
+
+	partition Program = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(Web.Contents("https://raw.githubusercontent.com/owilliams84/powerbi-workforce-analytics/main/data/dim_program.csv"), [Delimiter=",", Columns=2, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Applied Types" = Table.TransformColumnTypes(#"Promoted Headers", {{"ProgramKey", Int64.Type}, {"Program", type text}})
+				in
+				    #"Applied Types"
+
+	annotation PBI_ResultType = Table
