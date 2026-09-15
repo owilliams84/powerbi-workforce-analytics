@@ -1,0 +1,28 @@
+/// Headcount, joiners or leavers, for page 05's monthly charts.
+table 'YoY Chart Metric'
+	lineageTag: ffe27355-1334-539c-8339-ca80040669df
+
+	column Metric
+		dataType: string
+		lineageTag: 03ef3853-9681-5375-8f07-f025405a804a
+		summarizeBy: none
+		sourceColumn: Metric
+		sortByColumn: 'Metric Order'
+
+	column 'Metric Order'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: c19db49e-23dc-593e-b6ae-353518c15dae
+		summarizeBy: none
+		sourceColumn: Metric Order
+
+	partition 'YoY Chart Metric' = m
+		mode: import
+		source =
+				let
+				    Source = #table(type table [Metric = text, #"Metric Order" = Int64.Type], {{"Headcount", 1}, {"Joiners", 2}, {"Leavers", 3}})
+				in
+				    Source
+
+	annotation PBI_ResultType = Table

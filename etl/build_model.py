@@ -18,6 +18,8 @@ import time
 import uuid
 from pathlib import Path
 
+import yoy_model
+
 ROOT = Path(__file__).resolve().parents[1]
 MODEL = ROOT / "Workforce Analytics.SemanticModel"
 DEFN = MODEL / "definition"
@@ -486,6 +488,8 @@ def main() -> None:
     for name, spec in TABLES.items():
         write_table(name, spec, args.local)
     write_metrics()
+    # Page 05's measure and toggle tables live in their own module, on the milestone_pbir library.
+    yoy_tables = yoy_model.write(DEFN / "tables")
 
     write(DEFN / "database.tmdl", ["database", "\tcompatibilityLevel: 1606"])
 
@@ -503,7 +507,7 @@ def main() -> None:
         "",
         'annotation PBI_ProTooling = ["DevMode"]',
         "",
-    ] + [f"ref table {q(t)}" for t in list(TABLES) + ["Metrics"]])
+    ] + [f"ref table {q(t)}" for t in list(TABLES) + ["Metrics"] + yoy_tables])
 
     rel_lines: list[str] = []
     for i, (name, frm, to) in enumerate(RELATIONSHIPS):

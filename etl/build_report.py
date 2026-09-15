@@ -1,4 +1,7 @@
-"""Generate the PBIR report definition - four pages, the Milestone theme and every visual.
+"""Generate the PBIR report definition - five pages, the Milestone theme and every visual.
+
+Pages 01-04 use the helpers below. Page 05 (Year on Year) lives in etl/yoy_page.py, built on the
+milestone_pbir library, and adds the filter panel's bookmarks.
 
 PBIR stores one JSON file per visual and wraps every property in the same
 {"expr": {"Literal": {"Value": ...}}} envelope. Hand-editing that is how typos get in, so the
@@ -18,6 +21,9 @@ import shutil
 import sys
 import time
 from pathlib import Path
+
+import milestone_pbir
+import yoy_page
 
 ROOT = Path(__file__).resolve().parents[1]
 NAME = "Workforce Analytics"
@@ -836,7 +842,19 @@ def main() -> None:
     if PAGES.exists():
         rmtree_retry(PAGES)
 
-    builders = [page_overview, page_attrition, page_engagement, page_quality]
+    bookmarks_dir = REPORT / "definition" / "bookmarks"
+    if bookmarks_dir.exists():
+        rmtree_retry(bookmarks_dir)
+
+    # Page 05 is built on the milestone_pbir library and brings its filter-panel bookmarks.
+    bookmarks: list[dict] = []
+
+    def page_year_on_year() -> tuple[dict, list[dict]]:
+        pg, visuals, marks = yoy_page.build()
+        bookmarks.extend(marks)
+        return pg, visuals
+
+    builders = [page_overview, page_attrition, page_engagement, page_quality, page_year_on_year]
     order: list[str] = []
     total_visuals = 0
 
@@ -871,6 +889,10 @@ def main() -> None:
         "pageOrder": order,
         "activePageName": order[0],
     })
+
+    for mark in bookmarks:
+        write_json(bookmarks_dir / f"{mark['name']}.bookmark.json", mark)
+    write_json(bookmarks_dir / "bookmarks.json", milestone_pbir.bookmarks_metadata(bookmarks))
 
     write_json(REPORT / "definition" / "version.json", {
         "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/versionMetadata/1.0.0/schema.json",

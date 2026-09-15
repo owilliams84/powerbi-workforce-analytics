@@ -1,0 +1,64 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/bookmark/2.1.0/schema.json",
+  "displayName": "Year on year filters open",
+  "name": "bmYoyFiltersOpen",
+  "options": {
+    "targetVisualNames": [
+      "vScrimYoy",
+      "vPanelYoy",
+      "vPanelHeadYoy",
+      "vUnitYoy",
+      "vTypeYoy",
+      "vDoneYoy"
+    ],
+    "applyOnlyToTargetVisuals": true,
+    "suppressData": true,
+    "suppressActiveSection": true
+  },
+  "explorationState": {
+    "version": "1.3",
+    "activeSection": "pgYearOnYear",
+    "sections": {
+      "pgYearOnYear": {
+        "visualContainers": {
+          "vScrimYoy": {
+            "singleVisual": {
+              "visualType": "actionButton",
+              "objects": {}
+            }
+          },
+          "vPanelYoy": {
+            "singleVisual": {
+              "visualType": "textbox",
+              "objects": {}
+            }
+          },
+          "vPanelHeadYoy": {
+            "singleVisual": {
+              "visualType": "textbox",
+              "objects": {}
+            }
+          },
+          "vUnitYoy": {
+            "singleVisual": {
+              "visualType": "slicer",
+              "objects": {}
+            }
+          },
+          "vTypeYoy": {
+            "singleVisual": {
+              "visualType": "slicer",
+              "objects": {}
+            }
+          },
+          "vDoneYoy": {
+            "singleVisual": {
+              "visualType": "actionButton",
+              "objects": {}
+            }
+          }
+        }
+      }
+    }
+  }
+}

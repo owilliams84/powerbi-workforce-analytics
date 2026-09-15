@@ -1,0 +1,29 @@
+/// Top or Bottom for page 05's division table. Its own table: two toggles on one column
+/// cross-filter each other.
+table 'Division Ranking'
+	lineageTag: 3b52e658-e5db-5da4-8523-e393d6e1a40e
+
+	column Show
+		dataType: string
+		lineageTag: 0602ca8d-7297-5ca4-9d25-4ba6a988d603
+		summarizeBy: none
+		sourceColumn: Show
+		sortByColumn: 'Show Order'
+
+	column 'Show Order'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 8e3c5006-dc4b-59f3-865d-638ec8d011ad
+		summarizeBy: none
+		sourceColumn: Show Order
+
+	partition 'Division Ranking' = m
+		mode: import
+		source =
+				let
+				    Source = #table(type table [Show = text, #"Show Order" = Int64.Type], {{"Top", 1}, {"Bottom", 2}})
+				in
+				    Source
+
+	annotation PBI_ResultType = Table

@@ -1,0 +1,28 @@
+/// Button slicer values for what page 05 compares a year with. No relationships.
+table 'YoY Comparison'
+	lineageTag: 35886f19-4bd2-587a-8324-69a306d3050a
+
+	column Comparison
+		dataType: string
+		lineageTag: 85d3ad94-eb29-571d-97cc-471c9a75f7f7
+		summarizeBy: none
+		sourceColumn: Comparison
+		sortByColumn: 'Comparison Order'
+
+	column 'Comparison Order'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 09b398f3-f8d6-5fa7-b4ee-9c433c5b5223
+		summarizeBy: none
+		sourceColumn: Comparison Order
+
+	partition 'YoY Comparison' = m
+		mode: import
+		source =
+				let
+				    Source = #table(type table [Comparison = text, #"Comparison Order" = Int64.Type], {{"Prior year", 1}, {"Two years back", 2}})
+				in
+				    Source
+
+	annotation PBI_ResultType = Table

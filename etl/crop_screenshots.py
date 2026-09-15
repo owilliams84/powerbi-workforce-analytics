@@ -21,7 +21,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SHOTS = ROOT / "screenshots"
 BAND = (0x0A, 0x09, 0x17)
 PAGES = {"pgOverview": "overview", "pgAttrition": "attrition",
-         "pgEngagement": "engagement", "pgQuality": "data-quality"}
+         "pgEngagement": "engagement", "pgQuality": "data-quality", "pgYearOnYear": "year-on-year"}
 
 # The site's work card shows the overview: the headcount curve and the flows read at a glance.
 SITE_PAGE = "overview"

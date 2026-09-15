@@ -18,3 +18,7 @@ ref table Movement
 ref table Engagement
 ref table Training
 ref table Metrics
+ref table 'YoY Metrics'
+ref table 'YoY Comparison'
+ref table 'YoY Chart Metric'
+ref table 'Division Ranking'

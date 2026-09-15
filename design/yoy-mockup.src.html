@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Year on Year page mockup - Workforce Analytics</title>
+<!--
+  Design mockup for page 05, drawn at the 1440x900 canvas with the milestone-report-design tokens.
+  Figures are real: etl/yoy_expected.py, injected by design/build_mockup.py. Every block is tagged
+  with the Power BI visual it becomes.
+-->
+<style>
+  :root { --paper:#F4F6FA; --card:#FFFFFF; --rule:#E3E7EF; --ink:#0A0917; --body:#4A5768; --muted:#667284;
+          --gold:#C9A227; --navy:#111F38; --slate:#7C8598; --good:#1E7A4C; --bad:#B3261E; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:#d9dde6; font-family:"Segoe UI",system-ui,sans-serif; color:var(--body); }
+  .stage { width:1440px; height:900px; position:relative; background:var(--paper); margin:24px auto; overflow:hidden; }
+  .abs { position:absolute; }
+  .band { left:0; top:0; width:1440px; height:60px; background:var(--ink); }
+  .mark { left:24px; top:14px; width:40px; height:32px; border:2px solid #fff; border-radius:4px; }
+  .wordmark { left:76px; top:15px; color:#fff; font-weight:700; font-size:20px; } .wordmark b { color:var(--gold); }
+  .ref { right:24px; top:22px; color:var(--gold); font:700 11px Consolas,monospace; letter-spacing:2px; }
+  h1 { margin:0; left:24px; top:74px; font-size:29px; color:var(--ink); font-weight:700; }
+  .stand { left:24px; top:118px; width:690px; font-size:13px; line-height:1.45; }
+  .panel { background:var(--card); border:1px solid var(--rule); border-radius:4px; padding:8px 10px; }
+  .ptitle { font-size:14px; font-weight:700; color:var(--ink); } .psub { font-size:11.3px; color:var(--muted); margin-top:1px; }
+  .note { position:absolute; font:600 10px Consolas,monospace; color:#fff; background:#7a3cff; padding:1px 5px; border-radius:2px; z-index:50; pointer-events:none; opacity:.9; }
+  .seg { display:flex; border:1px solid var(--rule); border-radius:4px; background:var(--card); overflow:hidden; }
+  .seg button { flex:1; border:0; background:transparent; font:600 12px "Segoe UI"; color:var(--body); cursor:pointer; }
+  .seg button + button { border-left:1px solid var(--rule); } .seg button.on { background:var(--ink); color:#fff; }
+  .slabel { font:700 11px "Segoe UI"; color:var(--muted); letter-spacing:.5px; margin-bottom:4px; }
+  .btn { border:1px solid var(--ink); background:var(--card); color:var(--ink); font:600 12.5px "Segoe UI"; border-radius:4px; cursor:pointer; }
+  table { border-collapse:collapse; width:100%; font-size:12px; }
+  th { font-weight:700; color:var(--ink); text-align:right; padding:3px 6px; border-bottom:1px solid var(--rule); }
+  th:first-child, td:first-child { text-align:left; }
+  td { padding:2px 6px; text-align:right; border-bottom:1px solid var(--rule); height:22px; }
+  .empty { font-size:14px; color:var(--body); padding:40px 10px; }
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <div class="abs band"></div><div class="abs mark"></div>
+  <div class="abs wordmark">Milestone <b>BI</b></div><div class="abs ref">05 / YEAR ON YEAR</div>
+  <h1 class="abs">Year on year</h1>
+  <div class="abs stand" id="stand"></div>
+
+  <div class="abs" style="left:740px;top:78px;width:270px;"><div class="slabel">YEAR</div><div class="seg" id="segYear" style="height:34px"></div></div>
+  <span class="note" style="left:740px;top:64px">advancedSlicerVisual · Date[Year] 2019-2023</span>
+  <div class="abs" style="left:1022px;top:78px;width:228px;"><div class="slabel" style="font-size:10px">COMPARE THE SAME MONTHS WITH</div><div class="seg" id="segComp" style="height:34px"></div></div>
+  <span class="note" style="left:1022px;top:64px">disconnected 'YoY Comparison'</span>
+  <button class="abs btn" style="left:1262px;top:96px;width:154px;height:34px;">Filters</button>
+  <div class="abs" style="left:1262px;top:136px;width:154px;font-size:11px;color:var(--muted);text-align:center;">No filters applied</div>
+  <span class="note" style="left:1262px;top:82px">panel: Business Unit, Employee Type</span>
+
+  <div id="cards"></div>
+  <span class="note" style="left:24px;top:170px">4 × image visual · SVG measure</span>
+
+  <div class="abs panel" style="left:24px;top:332px;width:688px;height:264px;">
+    <div class="ptitle" id="lineTitle"></div><div class="psub" id="lineSub"></div>
+    <svg id="line" width="666" height="206" style="margin-top:4px"></svg>
+  </div>
+  <div class="abs seg" id="segMetric" style="left:402px;top:338px;width:300px;height:40px;"></div>
+  <span class="note" style="left:402px;top:326px">'YoY Chart Metric'</span>
+
+  <div class="abs panel" style="left:728px;top:332px;width:688px;height:264px;">
+    <div class="ptitle" id="varTitle"></div><div class="psub" id="varSub"></div>
+    <svg id="var" width="666" height="206" style="margin-top:4px"></svg>
+  </div>
+
+  <div class="abs panel" style="left:24px;top:612px;width:688px;height:264px;">
+    <div class="ptitle" id="deptTitle"></div><div class="psub" id="deptSub"></div><div id="deptTable" style="margin-top:6px"></div>
+  </div>
+  <span class="note" style="left:30px;top:868px">pivotTable · 6 departments · SVG bar · ALLSELECTED pool</span>
+
+  <div class="abs panel" style="left:728px;top:612px;width:688px;height:264px;">
+    <div class="ptitle" id="divTitle"></div><div class="psub" id="divSub"></div><div id="divTable" style="margin-top:6px"></div>
+  </div>
+  <div class="abs seg" id="segDiv" style="left:1258px;top:618px;width:148px;height:40px;"></div>
+  <span class="note" style="left:734px;top:868px">pivotTable · Top/Bottom 8 of 25 divisions · ALL pool</span>
+</div>
+
+<script>
+const DATA = /*DATA*/;
+const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const C = { ink:"#0A0917", body:"#4A5768", muted:"#667284", rule:"#E3E7EF", gold:"#C9A227", navy:"#111F38", slate:"#7C8598", good:"#1E7A4C", bad:"#B3261E" };
+const state = { year:2023, comp:"prior", metric:"Leavers", div:"Top" };
+const n = v => Math.round(v).toLocaleString("en-US");
+const sn = v => (v >= 0 ? "+" : "−") + n(Math.abs(v));
+const pct = (a, b) => b ? ((a - b) / b >= 0 ? "+" : "−") + Math.abs((a - b) / b * 100).toFixed(1) + "%" : "new";
+const pp = (a, b) => ((a - b) * 100 >= 0 ? "+" : "−") + Math.abs((a - b) * 100).toFixed(1) + "pp";
+const up = v => v >= 0 ? C.good : C.bad;      // more is better: headcount, joiners
+const down = v => v > 0 ? C.bad : C.good;     // more is worse: leavers, turnover
+
+function seg(id, opts, key) {
+  const el = document.getElementById(id);
+  el.innerHTML = opts.map(o => `<button data-v="${o[0]}">${o[1]}</button>`).join("");
+  el.querySelectorAll("button").forEach(b => b.onclick = () => { state[key] = isNaN(+b.dataset.v) ? b.dataset.v : +b.dataset.v; render(); });
+}
+seg("segYear", [2019,2020,2021,2022,2023].map(y => [y, String(y)]), "year");
+seg("segComp", [["prior","Prior year"],["two","Two years back"]], "comp");
+seg("segMetric", [["Headcount","Headcount"],["Joiners","Joiners"],["Leavers","Leavers"]], "metric");
+seg("segDiv", [["Top","Top"],["Bottom","Bottom"]], "div");
+
+function ring(cx, cy, r, share, col, over) {
+  const arc = (s, c) => { const a = 2*Math.PI*Math.min(s,.9999) - Math.PI/2;
+    return `<path d="M${cx},${cy-r} A${r},${r} 0 ${s>.5?1:0} 1 ${cx+r*Math.cos(a)},${cy+r*Math.sin(a)}" stroke="${c}" stroke-width="7" fill="none"/>`; };
+  return `<circle cx="${cx}" cy="${cy}" r="${r}" stroke="${C.rule}" stroke-width="7" fill="none"/>` + (share>0?arc(Math.min(share,1),col):"") + (over>0?arc(Math.min(over,1),C.gold):"");
+}
+function card(label, value, note, rows, g) {
+  return `<svg width="336" height="140" font-family="Segoe UI"><rect x=".5" y=".5" width="335" height="139" rx="4" fill="#fff" stroke="${C.rule}"/><rect width="3" height="140" fill="${C.gold}"/>
+  <text x="16" y="24" font-size="11" font-weight="700" fill="${C.muted}">${label}</text><text x="16" y="58" font-size="28" font-weight="700" fill="${C.ink}">${value}</text>
+  <text x="16" y="76" font-size="11.5" fill="${C.muted}">${note}</text><line x1="16" y1="88" x2="320" y2="88" stroke="${C.rule}"/>
+  ${rows.map((r,i)=>`<text x="16" y="${107+i*20}" font-size="11.5" fill="${C.body}">${r[0]}</text><text x="320" y="${107+i*20}" font-size="11.5" font-weight="600" text-anchor="end" fill="${r[2]}">${r[1]}</text>`).join("")}${g}</svg>`;
+}
+const empty = label => `<svg width="336" height="140" font-family="Segoe UI"><rect x=".5" y=".5" width="335" height="139" rx="4" fill="#fff" stroke="${C.rule}"/><text x="16" y="24" font-size="11" font-weight="700" fill="${C.muted}">${label}</text><text x="16" y="64" font-size="13" fill="${C.body}">Nothing to compare with for this year.</text></svg>`;
+
+function render() {
+  const d = DATA[`${state.year}_${state.comp}`];
+  [["segYear","year"],["segComp","comp"],["segMetric","metric"],["segDiv","div"]].forEach(([id,key]) =>
+    document.querySelectorAll(`#${id} button`).forEach(b => b.classList.toggle("on", String(state[key]) === b.dataset.v)));
+  const A = d.actual, B = d.comparison, cy = d.comparison_year, span = `${MONTHS[d.months[0]-1]}–${MONTHS[d.months[1]-1]}`;
+  const spanLong = d.months[0] === 1 && d.months[1] === 12 ? `${d.year}` : `January to ${["","","","","","","","July"][d.months[1]] || MONTHS[d.months[1]-1]} ${d.year}`;
+  const ids = ["cards","line","var","deptTable","divTable"];
+  if (!d.available) {
+    document.getElementById("stand").textContent = `${d.year} has nothing to compare with: ${cy < 2018 ? cy + " is before the records start" : "2018 holds only August to December"}.`;
+    document.getElementById("cards").innerHTML = ["HEADCOUNT","LEAVERS","TURNOVER, ANNUALISED","DIVISIONS WITH MORE LEAVERS"].map((l,i)=>`<div class="abs" style="left:${24+i*352}px;top:176px">${empty(l)}</div>`).join("");
+    ["line","var"].forEach(id => document.getElementById(id).innerHTML = "");
+    ["deptTable","divTable"].forEach(id => document.getElementById(id).innerHTML = "");
+    ["lineSub","varSub","deptSub","divSub"].forEach(id => document.getElementById(id).textContent = "");
+    document.getElementById("lineTitle").textContent = `${state.metric} by month, ${d.year} against ${cy}`;
+    document.getElementById("varTitle").textContent = `Which months moved ${state.metric.toLowerCase()}`;
+    document.getElementById("deptTitle").textContent = `Turnover by department, ${d.year} against ${cy}`;
+    document.getElementById("divTitle").textContent = `The 8 divisions where leavers rose most`;
+    return;
+  }
+  document.getElementById("stand").textContent =
+    `${spanLong} against the same months of ${cy}: leavers ${A.leavers >= B.leavers ? "up" : "down"} from ${n(B.leavers)} to ${n(A.leavers)}, joiners ${A.joiners >= B.joiners ? "up" : "down"} from ${n(B.joiners)} to ${n(A.joiners)}. ` +
+    `Annualised turnover went from ${(B.turnover*100).toFixed(1)}% to ${(A.turnover*100).toFixed(1)}%, and headcount ${A.headcount >= B.headcount ? "rose" : "fell"} to ${n(A.headcount)}.`;
+
+  const hr = A.headcount / B.headcount, lr = A.leavers / B.leavers;
+  const dep = d.departments, divs = d.divisions_all, maxV = d.max_abs_division_change;
+  const byChange = [...divs].sort((a,b)=>b.change-a.change);
+  const tw = 144 / Math.max(A.turnover, B.turnover);
+  const cards = [
+    card(`HEADCOUNT, END ${MONTHS[d.months[1]-1].toUpperCase()} ${d.year}`, n(A.headcount), `${pct(A.headcount,B.headcount)} on ${MONTHS[d.months[1]-1]} ${cy} (${n(B.headcount)})`,
+      [[`Joiners, ${span} · ${n(A.joiners)}`, pct(A.joiners,B.joiners), up(A.joiners-B.joiners)],
+       [`Net change, ${span}`, sn(A.joiners-A.leavers), up(A.joiners-A.leavers)]],
+      ring(286,42,26,Math.min(hr,1),C.navy,hr-1) + `<text x="286" y="47" font-size="13" font-weight="700" text-anchor="middle" fill="${C.ink}">${Math.round(hr*100)}%</text>`),
+    card(`LEAVERS, ${span.toUpperCase()} ${d.year}`, n(A.leavers), `${pct(A.leavers,B.leavers)} on ${cy} (${n(B.leavers)})`,
+      [[`Left in year one · ${(A.early_share*100).toFixed(1)}%`, pp(A.early_share,B.early_share), down(A.early_share-B.early_share)],
+       [`Joiners per leaver · ${(A.joiners/A.leavers).toFixed(2)}`, `was ${(B.joiners/B.leavers).toFixed(2)}`, up(A.joiners/A.leavers - B.joiners/B.leavers)]],
+      ring(286,42,26,Math.min(lr,1),C.navy,lr-1) + `<text x="286" y="47" font-size="13" font-weight="700" text-anchor="middle" fill="${C.ink}">${Math.round(lr*100)}%</text>`),
+    card(`TURNOVER, ANNUALISED`, (A.turnover*100).toFixed(1)+"%", `${pp(A.turnover,B.turnover)} on ${cy} (${(B.turnover*100).toFixed(1)}%)`,
+      [[`Most up · ${dep[0].name}`, (dep[0].change_pp>=0?"+":"−")+Math.abs(dep[0].change_pp).toFixed(1)+"pp", down(dep[0].change_pp)],
+       [`Least up · ${dep.at(-1).name}`, (dep.at(-1).change_pp>=0?"+":"−")+Math.abs(dep.at(-1).change_pp).toFixed(1)+"pp", down(dep.at(-1).change_pp)]],
+      `<text x="176" y="24" font-size="9" fill="${C.muted}">${d.year}</text><rect x="204" y="16" width="${A.turnover*tw*0.8}" height="10" fill="${C.navy}"/>` +
+      `<text x="176" y="44" font-size="9" fill="${C.muted}">${cy}</text><rect x="204" y="36" width="${B.turnover*tw*0.8}" height="10" fill="${C.slate}"/>`),
+    card(`DIVISIONS WITH MORE LEAVERS`, `${d.divisions_up}`, `of ${d.divisions_in_play} divisions with leavers in either year`,
+      [["Most up · " + byChange[0].name, sn(byChange[0].change), down(byChange[0].change)],
+       ["Most down · " + byChange.at(-1).name, sn(byChange.at(-1).change), down(byChange.at(-1).change)]],
+      `<line x1="176" y1="46" x2="320" y2="46" stroke="${C.rule}"/>` + byChange.map((a,i)=>{ const h=Math.max(1.5,20*Math.abs(a.change)/maxV); return `<rect x="${176+i*5.8}" y="${a.change>=0?46-h:46}" width="4.2" height="${h}" fill="${down(a.change)}"/>`; }).join(""))
+  ];
+  document.getElementById("cards").innerHTML = cards.map((s,i)=>`<div class="abs" style="left:${24+i*352}px;top:176px">${s}</div>`).join("");
+
+  const key = state.metric.toLowerCase(), better = state.metric === "Leavers" ? down : up;
+  const mon = d.monthly.map(m => ({ month:m.month, actual:m[key], comparison:m[key+"_comp"], variance:m[key]-m[key+"_comp"] }));
+  const W=666,H=206,L=46,Rr=10,T=12,B2=22, nm = mon.length;
+  const max = Math.max(...mon.map(m=>Math.max(m.actual,m.comparison)))*1.1, min = 0;
+  const X=i=>L+i*(W-L-Rr)/Math.max(nm-1,1), Y=v=>T+(H-T-B2)*(1-(v-min)/(max-min));
+  let g=""; for(let i=0;i<=4;i++){const v=min+(max-min)*i/4; g+=`<line x1="${L}" x2="${W-Rr}" y1="${Y(v)}" y2="${Y(v)}" stroke="${C.rule}"/><text x="${L-6}" y="${Y(v)+3}" font-size="10" text-anchor="end" fill="${C.muted}">${n(v)}</text>`;}
+  mon.forEach((m,i)=>g+=`<text x="${X(i)}" y="${H-6}" font-size="10" text-anchor="middle" fill="${C.muted}">${MONTHS[m.month-1]}</text>`);
+  const path=a=>a.map((v,i)=>`${i?"L":"M"}${X(i)},${Y(v)}`).join("");
+  g+=`<path d="${path(mon.map(m=>m.comparison))}" stroke="${C.slate}" stroke-width="2" stroke-dasharray="5 4" fill="none"/><path d="${path(mon.map(m=>m.actual))}" stroke="${C.navy}" stroke-width="2.5" fill="none"/>`;
+  document.getElementById("line").innerHTML = g;
+  document.getElementById("lineTitle").textContent = `${state.metric} by month, ${d.year} against ${cy}`;
+  document.getElementById("lineSub").textContent = `Above ${cy} in ${mon.filter(m=>m.variance>0).length} of ${nm} months`;
+
+  const vmax = Math.max(1, ...mon.map(m=>Math.abs(m.variance)))*1.15, VY=v=>T+(H-T-B2)*(.5-v/vmax/2), bw=(W-L-Rr)/nm;
+  let vg=`<line x1="${L}" x2="${W-Rr}" y1="${VY(0)}" y2="${VY(0)}" stroke="${C.muted}"/>`;
+  mon.forEach((m,i)=>{const x=L+i*bw+bw*.2; vg+=`<rect x="${x}" y="${Math.min(VY(m.variance),VY(0))}" width="${bw*.6}" height="${Math.abs(VY(m.variance)-VY(0))}" fill="${better(m.variance)}"/><text x="${x+bw*.3}" y="${m.variance>=0?VY(m.variance)-4:VY(m.variance)+12}" font-size="10" text-anchor="middle" fill="${C.body}">${sn(m.variance)}</text><text x="${x+bw*.3}" y="${H-6}" font-size="10" text-anchor="middle" fill="${C.muted}">${MONTHS[m.month-1]}</text>`;});
+  document.getElementById("var").innerHTML = vg;
+  document.getElementById("varTitle").textContent = `Which months moved ${state.metric.toLowerCase()}`;
+  const most = mon.reduce((a,b)=>Math.abs(b.variance)>Math.abs(a.variance)?b:a);
+  document.getElementById("varSub").textContent = `${d.year} less ${cy}, by month: ${MONTHS[most.month-1]} moved most (${sn(most.variance)})`;
+
+  const bar = (v, mx) => { const w=56*Math.abs(v)/mx; return `<svg width="120" height="16"><line x1="60" x2="60" y1="0" y2="16" stroke="${C.muted}"/><rect x="${v>=0?60:60-w}" y="3" width="${w}" height="10" fill="${down(v)}"/></svg>`; };
+  const ppf = v => (v>=0?"+":"−")+Math.abs(v).toFixed(1)+"pp";
+  document.getElementById("deptTable").innerHTML = `<table><tr><th>Department</th><th>Headcount</th><th>Leavers</th><th>${cy}</th><th>Turnover</th><th>${cy}</th><th>Change</th><th></th></tr>` +
+    dep.map(u=>`<tr><td>${u.name}</td><td>${n(u.headcount)}</td><td>${n(u.leavers)}</td><td>${n(u.leavers_comp)}</td><td>${(u.turnover*100).toFixed(1)}%</td><td>${(u.turnover_comp*100).toFixed(1)}%</td><td style="color:${down(u.change_pp)}">${ppf(u.change_pp)}</td><td>${bar(u.change_pp,d.max_abs_department_pp)}</td></tr>`).join("") + "</table>";
+  document.getElementById("deptTitle").textContent = `Turnover by department, ${d.year} against ${cy}`;
+  document.getElementById("deptSub").textContent = `Annualised over ${span}; up in ${d.departments_up} of ${dep.length}, most in ${dep[0].name}${dep[0].headcount < 40 ? " (" + dep[0].headcount + " people)" : ""}`;
+
+  const rows = state.div === "Top" ? d.divisions_top : d.divisions_bottom;
+  document.getElementById("divTable").innerHTML = `<table><tr><th>Division</th><th>#</th><th>Leavers</th><th>${cy}</th><th>Change</th><th></th></tr>` +
+    rows.map((a,i)=>`<tr><td>${a.name}</td><td>${i+1}</td><td>${n(a.leavers)}</td><td>${n(a.leavers_comp)}</td><td style="color:${down(a.change)}">${sn(a.change)}</td><td>${bar(a.change,maxV)}</td></tr>`).join("") + "</table>";
+  document.getElementById("divTitle").textContent = state.div === "Top" ? `The 8 divisions where leavers rose most` : `The 8 divisions where leavers rose least`;
+  document.getElementById("divSub").textContent = `Leavers ${span} ${d.year} less the same months of ${cy}`;
+}
+render();
+</script>
+</body>
+</html>

@@ -4,7 +4,8 @@
     "pgOverview",
     "pgAttrition",
     "pgEngagement",
-    "pgQuality"
+    "pgQuality",
+    "pgYearOnYear"
   ],
   "activePageName": "pgOverview"
 }

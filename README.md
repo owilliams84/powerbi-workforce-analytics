@@ -19,6 +19,42 @@ pull request.
 - **$735,145 of training cost - 44% of the total - is recorded against people who were not
   employed on the training date.**
 
+## Page 05: year on year
+
+![Year on year](screenshots/year-on-year.png)
+
+Pick a year and compare it with the same months of the prior year or two years back. January to
+July 2023 against the same months of 2022: leavers rose from 216 to 570 and joiners fell from 352
+to 322. Annualised turnover went from 22.4% to 60.1%, and headcount at the end of July was 1,480
+against 1,704. Turnover rose in all six departments. The biggest rise is in the Executive Office,
+where five people make the rate jumpy, and the table says so.
+
+- **The same months.** The window is the month-ends the chosen year has a snapshot for. That is
+  January to July for 2023, which is why this page shows 60.1% where page 01 shows 62.8% (page 01
+  also counts leavers from 1 to 6 August). A comparison exists only when the earlier year covers
+  every one of those months, so 2019 against 2018 shows *nothing to compare with* and says why.
+- **Four SVG cards**: headcount with a ring against the comparison, leavers with the year-one
+  share, annualised turnover in both periods, and every division as a bar. Green and red mean
+  better or worse, so more leavers is red.
+- **Charts** of headcount, joiners or leavers by month (a button slicer switches between them),
+  plus the monthly change.
+- **Department table** with SVG bars. **Top/Bottom 8 divisions** by change in leavers. Ties go to
+  more leavers, then to the name, so exactly eight rows show.
+- **Filters panel** (Business Unit, Employee Type), opened by a bookmark button and closed by *Done*
+  or by clicking the dimmed page. Every number follows it.
+
+The page was drawn first as an HTML mockup with real figures (`design/yoy-mockup.html`, built by
+`design/build_mockup.py`), then generated. `etl/yoy_model.py` writes the measures and toggle
+tables, and `etl/yoy_page.py` writes the layout. Both are built on `etl/milestone_pbir.py`, a
+vendored copy of the Milestone BI report library.
+
+`etl/yoy_expected.py` computes every figure in pandas. `etl/verify_yoy.ps1` queries the live
+model with each slicer pinned, including a Business Unit set in the panel, and
+`etl/compare_yoy.py` diffs the two. 1,046 checks matched across six states: 2023 against the prior
+year and against two years back, 2022, 2021, and the two empty states.
+
+![Other states: 2021 against 2019 with the filter panel open, and 2019 with nothing to compare](screenshots/year-on-year-other-states.png)
+
 ## What the source gets wrong, and what the model does about it
 
 | Problem | Evidence | Decision |
@@ -58,6 +94,9 @@ python etl/build_model.py            # TMDL - partitions read data/ from this re
 python etl/build_report.py           # PBIR
 powershell -File etl/check_tmdl.ps1  # parse the TMDL with Desktop's own serializer
 ```
+
+Close Power BI Desktop before running the generators: while a project is open, Desktop can
+write its in-memory copy back over the regenerated files.
 
 Open `Workforce Analytics.pbip` in Power BI Desktop and refresh. `etl/verify_measures.py`
 recomputes ten measures in pandas by year, by department and in total and diffs them against
