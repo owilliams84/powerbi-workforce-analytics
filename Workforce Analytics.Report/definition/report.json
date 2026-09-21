@@ -62,6 +62,116 @@
           "name": "MilestoneMark.svg",
           "path": "MilestoneMark.svg",
           "type": "Image"
+        },
+        {
+          "name": "GlanceNavActive.svg",
+          "path": "GlanceNavActive.svg",
+          "type": "Image"
+        },
+        {
+          "name": "GlanceNavGlance.svg",
+          "path": "GlanceNavGlance.svg",
+          "type": "Image"
+        },
+        {
+          "name": "GlanceNavOverview.svg",
+          "path": "GlanceNavOverview.svg",
+          "type": "Image"
+        },
+        {
+          "name": "GlanceNavAttrition.svg",
+          "path": "GlanceNavAttrition.svg",
+          "type": "Image"
+        },
+        {
+          "name": "GlanceNavEngagement.svg",
+          "path": "GlanceNavEngagement.svg",
+          "type": "Image"
+        },
+        {
+          "name": "GlanceNavQuality.svg",
+          "path": "GlanceNavQuality.svg",
+          "type": "Image"
+        },
+        {
+          "name": "GlanceNavYoy.svg",
+          "path": "GlanceNavYoy.svg",
+          "type": "Image"
+        },
+        {
+          "name": "IconCap.svg",
+          "path": "IconCap.svg",
+          "type": "Image"
+        },
+        {
+          "name": "IconClipboardX.svg",
+          "path": "IconClipboardX.svg",
+          "type": "Image"
+        },
+        {
+          "name": "IconCoin.svg",
+          "path": "IconCoin.svg",
+          "type": "Image"
+        },
+        {
+          "name": "IconDatabase.svg",
+          "path": "IconDatabase.svg",
+          "type": "Image"
+        },
+        {
+          "name": "IconExit.svg",
+          "path": "IconExit.svg",
+          "type": "Image"
+        },
+        {
+          "name": "IconHeartPulse.svg",
+          "path": "IconHeartPulse.svg",
+          "type": "Image"
+        },
+        {
+          "name": "IconHourglass.svg",
+          "path": "IconHourglass.svg",
+          "type": "Image"
+        },
+        {
+          "name": "IconPeople.svg",
+          "path": "IconPeople.svg",
+          "type": "Image"
+        },
+        {
+          "name": "IconPercent.svg",
+          "path": "IconPercent.svg",
+          "type": "Image"
+        },
+        {
+          "name": "IconPersonPlus.svg",
+          "path": "IconPersonPlus.svg",
+          "type": "Image"
+        },
+        {
+          "name": "IconRepeat.svg",
+          "path": "IconRepeat.svg",
+          "type": "Image"
+        },
+        {
+          "name": "IconScales.svg",
+          "path": "IconScales.svg",
+          "type": "Image"
+        },
+        {
+          "name": "IconSmile.svg",
+          "path": "IconSmile.svg",
+          "type": "Image"
+        },
+        {
+          "name": "IconStopwatch.svg",
+          "path": "IconStopwatch.svg",
+          "type": "Image"
+        },
+        {
+          "name": "IconWarning.svg",
+          "path": "IconWarning.svg",
+          "type": "Image"
         }
       ]
     },

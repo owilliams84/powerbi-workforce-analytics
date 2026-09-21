@@ -19,6 +19,34 @@ pull request.
 - **$735,145 of training cost - 44% of the total - is recorded against people who were not
   employed on the training date.**
 
+## Landing page: at a glance
+
+![At a glance](screenshots/at-a-glance.png)
+
+The page a people team opens first: one year, read at a glance, with a rail of icons down the
+left that links to the five analysis pages. Pick a year, and optionally a department, business
+unit or job role, and every tile, chart and title follows.
+
+- **Five KPI tiles**, each an SVG image with its icon drawn in: headcount, new hires, annualised
+  turnover, engagement score and average performance rating. The first three compare with the
+  same months of the year before, using page 05's measures, so the two pages cannot disagree.
+  Green and red mean better or worse, so a rise in turnover is red. 2019 has no earlier year to
+  compare with and the tiles say so; years before the survey ran show *n/a*, not a blank.
+- **Nine panels**: headcount by department, gender, business unit, employee type and performance
+  rating, the top five job roles, month-end headcount against the year before, turnover by
+  department, and the five most recent hires. Each title is a measure that states what the chart
+  shows under the current slicers.
+- **Counts are a stock, read at the year's last month-end.** Hires and turnover are flows over the
+  months the year has a snapshot for. The paragraph under the title says which is which.
+- The source has no attendance data, so this page has none. Location is left out too: 1,304 of
+  the 1,480 people are in one state, so business unit is the split that shows something.
+
+`design/build_glance_mockup.py` draws the mockup, `etl/glance_model.py` writes the measures,
+`etl/glance_page.py` the layout and `etl/glance_icons.py` the eleven icons. `etl/verify_glance.py`
+asks the live model for every figure on the page and diffs it against `etl/glance_expected.py`
+(pandas): 579 checks over seven states, including each dropdown pinned and the year with nothing
+to compare, all matching.
+
 ## Page 05: year on year
 
 ![Year on year](screenshots/year-on-year.png)

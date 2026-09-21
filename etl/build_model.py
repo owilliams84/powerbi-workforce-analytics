@@ -18,6 +18,7 @@ import time
 import uuid
 from pathlib import Path
 
+import glance_model
 import yoy_model
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -490,6 +491,8 @@ def main() -> None:
     write_metrics()
     # Page 05's measure and toggle tables live in their own module, on the milestone_pbir library.
     yoy_tables = yoy_model.write(DEFN / "tables")
+    # The landing page reuses page 05's window and comparison measures, so it is written after them.
+    glance_tables = glance_model.write(DEFN / "tables")
 
     write(DEFN / "database.tmdl", ["database", "\tcompatibilityLevel: 1606"])
 
@@ -507,7 +510,7 @@ def main() -> None:
         "",
         'annotation PBI_ProTooling = ["DevMode"]',
         "",
-    ] + [f"ref table {q(t)}" for t in list(TABLES) + ["Metrics"] + yoy_tables])
+    ] + [f"ref table {q(t)}" for t in list(TABLES) + ["Metrics"] + yoy_tables + glance_tables])
 
     rel_lines: list[str] = []
     for i, (name, frm, to) in enumerate(RELATIONSHIPS):

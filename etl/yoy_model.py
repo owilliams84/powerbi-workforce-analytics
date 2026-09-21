@@ -309,6 +309,7 @@ VAR Svg =
     ('"Joiners, " & Span & " &#183; " & ' + count("J"), pct("JP"), tone("J - JC")),
     ('"Net change, " & Span', signed("Net"), tone("Net")),
     ratio_ring(),
+    icon="people",
 ))}
 VAR NoComparison = {no_comparison("HEADCOUNT")}
 RETURN
@@ -336,6 +337,7 @@ VAR Svg =
     ('"Left in year one &#183; " & FORMAT(ES, "0.0%")', pp("ES", "ESC"), tone("ES - ESC", higher_is_better=False)),
     ('"Joiners per leaver &#183; " & FORMAT(JPL, "0.00")', '"was " & FORMAT(JPLC, "0.00")', tone("JPL - JPLC")),
     ratio_ring(),
+    icon="exit",
 ))}
 VAR NoComparison = {no_comparison("LEAVERS")}
 RETURN
@@ -370,6 +372,7 @@ VAR Svg =
     ('IF(LowValue > 0, "Smallest rise &#183; ", "Biggest fall &#183; ") & LEFT(MAXX(LowRow, \'Employee\'[Department]), 22)',
      points("LowValue"), tone("LowValue", higher_is_better=False)),
     "Bars",
+    icon="repeat",
 ))}
 VAR NoComparison = {no_comparison("TURNOVER, ANNUALISED")}
 RETURN
@@ -404,6 +407,7 @@ VAR Svg =
     ('"Most up &#183; " & LEFT(MAXX(UpRow, \'Employee\'[Division]), 24)', signed("UpValue"), tone("UpValue", higher_is_better=False)),
     ('"Most down &#183; " & LEFT(MAXX(DownRow, \'Employee\'[Division]), 24)', signed("DownValue"), tone("DownValue", higher_is_better=False)),
     "Bars",
+    icon="layers",
 ))}
 VAR NoComparison = {no_comparison("DIVISIONS WITH MORE LEAVERS")}
 RETURN

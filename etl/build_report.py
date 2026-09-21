@@ -22,7 +22,9 @@ import sys
 import time
 from pathlib import Path
 
+import milestone_icons
 import milestone_pbir
+import glance_page
 import yoy_page
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -306,9 +308,13 @@ def image(name: str, x: int, y: int, w: int, h: int, z: int, resource: str) -> d
     return node
 
 
+# Icons the KPI strips ask for; main() registers exactly these as report resources.
+USED_ICONS: set[str] = set()
+
+
 def kpi_card(name: str, x: int, y: int, w: int, h: int, z: int, measures: list[dict],
-             filters: list | None = None, value_size: float = 17.0) -> dict:
-    return visual(
+             filters: list | None = None, value_size: float = 17.0, icons: list[str] | None = None) -> dict:
+    node = visual(
         name, "cardVisual", x, y, w, h, z,
         query={"queryState": {"Data": {"projections": measures}}},
         objects={
@@ -330,6 +336,11 @@ def kpi_card(name: str, x: int, y: int, w: int, h: int, z: int, measures: list[d
         },
         filters=filters,
     )
+    if icons:
+        # One icon to the left of each value, from etl/milestone_icons.py.
+        node["visual"]["objects"]["image"] = milestone_icons.card_images(measures, icons, w)
+        USED_ICONS.update(icons)
+    return node
 
 
 def slicer(name: str, x: int, y: int, w: int, h: int, z: int, table: str, col: str,
@@ -498,7 +509,7 @@ def page_overview() -> tuple[dict, list[dict]]:
         m("Leavers", "Leavers"),
         m("Annualised Turnover %", "Turnover, annualised"),
         m("Early Leaver Share %", "Leavers in year one"),
-    ]))
+    ], icons=["people", "person-plus", "exit", "repeat", "stopwatch"]))
 
     v.append(chart(
         "vHeadcount", "lineChart", 24, 284, 900, 300, 600,
@@ -572,7 +583,7 @@ def page_attrition() -> tuple[dict, list[dict]]:
         m("Early Leaver Share %", "Left in year one"),
         m("Median Tenure at Exit", "Median years at exit"),
         m("Voluntary Share %", "Voluntary"),
-    ]))
+    ], icons=["exit", "repeat", "stopwatch", "hourglass", "percent"]))
 
     v.append(chart(
         "vRolling", "lineChart", 24, 284, 900, 300, 600,
@@ -645,7 +656,7 @@ def page_engagement() -> tuple[dict, list[dict]]:
         m("Work-Life Balance Score", "Work-life balance, 1-5"),
         m("Completion Rate %", "Training completed or passed"),
         m("Training Cost", "Training cost, in employment"),
-    ]))
+    ], icons=["heart-pulse", "smile", "scales", "cap", "coin"]))
 
     v.append(chart(
         "vEngDept", "clusteredBarChart", 24, 284, 452, 300, 600,
@@ -720,7 +731,7 @@ def page_quality() -> tuple[dict, list[dict]]:
         m("Status Conflict Rate %", "Share of records"),
         m("Surveys Outside Employment", "Surveys, not employed"),
         m("Training Records Outside Employment", "Training, not employed"),
-    ]))
+    ], icons=["database", "warning", "percent", "clipboard-x", "cap"]))
 
     v.append(table_visual(
         "vStatusMatrix", 24, 284, 700, 300, 600,
@@ -854,7 +865,13 @@ def main() -> None:
         bookmarks.extend(marks)
         return pg, visuals
 
-    builders = [page_overview, page_attrition, page_engagement, page_quality, page_year_on_year]
+    def page_glance() -> tuple[dict, list[dict]]:
+        pg, visuals, marks = glance_page.build()
+        bookmarks.extend(marks)
+        return pg, visuals
+
+    # The landing page goes first; pages 01-05 keep their numbers.
+    builders = [page_glance, page_overview, page_attrition, page_engagement, page_quality, page_year_on_year]
     order: list[str] = []
     total_visuals = 0
 
@@ -922,7 +939,10 @@ def main() -> None:
         "resourcePackages": [
             {"name": "RegisteredResources", "type": "RegisteredResources",
              "items": [{"name": THEME_NAME, "path": THEME_NAME, "type": "CustomTheme"},
-                       {"name": MARK_NAME, "path": MARK_NAME, "type": "Image"}]},
+                       {"name": MARK_NAME, "path": MARK_NAME, "type": "Image"}]
+                      + [{"name": n, "path": n, "type": "Image"} for n in glance_page.resources()]
+                      + [{"name": n, "path": n, "type": "Image"}
+                         for n in milestone_icons.resources(USED_ICONS)]},
             {"name": "SharedResources", "type": "SharedResources",
              "items": [{"name": "CY25SU12", "path": "BaseThemes/CY25SU12.json",
                         "type": "BaseTheme"}]},
@@ -933,6 +953,10 @@ def main() -> None:
     RESOURCES.mkdir(parents=True, exist_ok=True)
     write_json(RESOURCES / THEME_NAME, theme())
     shutil.copyfile(ASSETS / "milestone-mark.svg", RESOURCES / MARK_NAME)
+    for icon_file, svg in milestone_icons.resources(USED_ICONS).items():
+        (RESOURCES / icon_file).write_text(svg, encoding="utf-8", newline="\n")
+    for name, svg in glance_page.resources().items():
+        (RESOURCES / name).write_text(svg, encoding="utf-8", newline="\n")
 
     write_json(REPORT / "definition.pbir", {
         "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definitionProperties/2.0.0/schema.json",
